@@ -20,7 +20,7 @@ Requirements
 Prerequisites
 -------------
 
-Currently, every series needs to be in a directory named after that series, containing a directory per season, containing all the media files for that season. An example would be *Fawlty Towers/S01/Fawlty Towers S01E03.avi". The script will try its best to figure out the episode number from the file name. When that fails, it will just clean up the file name a bit; however, you will lose episode information.
+Currently, every series needs to be in a directory named after that series, containing a directory per season, containing all the media files for that season. An example would be *Fawlty Towers/S01/Fawlty Towers S01E03.avi". The script will try its best to figure out the episode number from the file name. If that fails, it will just clean up the file name a bit; however, you will lose episode information.
 
 Usage
 -----
