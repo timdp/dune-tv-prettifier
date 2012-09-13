@@ -29,7 +29,7 @@ my %opt = (
 		'renew-stills' => \$renew_stills,
 	);
 my %config;
-my $config_file = my_home . '/.dune-tv-prettifier.json';
+my $config_file = my_home() . '/.dune-tv-prettifier.json';
 if (-f $config_file) {
 	%config = %{read_json($config_file)};
 } else {
@@ -154,13 +154,13 @@ opendir(my $base_dh, $base_path)
 	or croak qq{Cannot open directory "$base_path": $!};
 my @subdirs = readdir($base_dh);
 closedir($base_dh);
-my @series = grep { /^[^._]/ && -d $base_path . "/$_" } @subdirs;
+my @series = grep { /^[^._]/ && -d "$base_path/$_" } @subdirs;
 print ' Found ', scalar(@series), $/;
 
 print 'Checking modification times ...';
 my %mtimes = ();
 foreach my $series (@series) {
-	my $series_path = $base_path . "/$series";
+	my $series_path = "$base_path/$series";
 	my $series_mtime = mtime($series_path);
 	opendir(my $dh, $series_path)
 		or croak qq{Cannot open directory "$series_path": $!};
@@ -224,10 +224,10 @@ my $season_temp = tmpnam();
 foreach my $series (@series) {
 	print $series;
 
-	my $series_info_file = $config{cache_path} . "/info/$series.json";
+	my $series_info_file = "$config{cache_path}/info/$series.json";
 	my $series_info = -e $series_info_file ? read_json($series_info_file) : {};
 
-	opendir(my $dh, $base_path . "/$series")
+	opendir(my $dh, "$base_path/$series")
 		or croak qq{Cannot open directory "$base_path/$series": $!};
 	my @seasons = readdir($dh);
 	closedir($dh);
@@ -569,7 +569,7 @@ END
 				$vh = $info->{height};
 			} else {
 				($vw, $vh) = get_video_dimensions(
-					$base_path . "/$series/$season_id/$file");
+					"$base_path/$series/$season_id/$file");
 				$series_info->{files}{$season_id}{$file}
 					= { 'width' => $vw, 'height' => $vh };
 			}
@@ -883,7 +883,7 @@ sub create_fancy_label {
 	my $file = "$dune_path/labels/$hash.png";
 	if ($force_renew || $renew_labels || !-s $file) {
 		my $overrun = 10;
-		my $path = $base_path . "/$relpath";
+		my $path = "$base_path/$relpath";
 		my $thumbnail_height = $config{episode_height} - 2;
 		my $thumbnail_width = round(
 			$config{episode_thumbnail_aspect_ratio} * $thumbnail_height);
@@ -979,7 +979,7 @@ sub create_fancy_label {
 sub get_video_still {
 	my ($file, $width, $height) = @_;
 	my $hash = md5_hex($file);
-	my $still_path = $config{cache_path} . "/stills/$hash.jpg";
+	my $still_path = "$config{cache_path}/stills/$hash.jpg";
 	if ($renew_stills || !-s $still_path) {
 		my $duration = get_media_duration($file);
 		return undef unless defined $duration;
