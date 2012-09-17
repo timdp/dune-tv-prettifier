@@ -540,11 +540,12 @@ END
 						if (@titles == 1) {
 							$ep_title = $titles[0];
 						} elsif (@titles) {
-							if ($titles[0] =~ /^(.*) \((\d+)\)$/) {
-								my ($t, $n) = ($1, $2);
+							if ($titles[0] =~ /^(.*) \((Part )?(\d+)\)$/) {
+								my ($t, $p, $n) = ($1, $2, $3);
+								$p = '' unless defined $p;
 								my $i = 1;
 								while ($i < @titles
-										&& $titles[$i] eq "$t (" . ($n + $i) . ')') {
+										&& $titles[$i] eq "$t ($p" . ($n + $i) . ')') {
 									$i++;
 								}
 								$ep_title = $t if $i == @titles;
