@@ -243,7 +243,7 @@ foreach my $series (@series) {
 		|| !exists $series_info->{content_box_y};
 	my $renew_season_images = $renew_images || !$tree_ok;
 
-	if (!$renew_labels && !$renew_stills
+	if (!$renew_images && !$renew_labels && !$renew_stills
 			&& $series_info->{update_date}
 			&& $mtimes{$series} < $series_info->{update_date}) {
 		print " (up to date)$/";
