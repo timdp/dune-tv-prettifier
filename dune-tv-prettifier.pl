@@ -626,6 +626,13 @@ END
 }
 
 print 'Creating root menu ...';
+my $bg_path = "$dune_path/background_black.png";
+unless (-e $bg_path) {
+	my $bg_gd = GD::Image->new(
+		$config{background_width}, $config{background_height});
+	$bg_gd->colorAllocate(0, 0, 0);
+	write_image($bg_gd, $bg_path);
+}
 @series = map { $_->[1] }
 	sort { $a->[0] cmp $b->[0] }
 	map { [ uc(strip_non_words(strip_article(unaccent($_)))), $_ ] }
