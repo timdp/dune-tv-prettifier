@@ -141,13 +141,13 @@ my %font_metrics = ();
 my $dune_path = $base_path . '/' . $config{data_dir_name};
 my $dune_url = $base_url . '/' . $config{data_dir_name};
 
-mkdir "$dune_path";
-mkdir "$dune_path/labels";
-mkdir "$dune_path/content";
-mkdir "$config{cache_path}";
-mkdir "$config{cache_path}/banners";
-mkdir "$config{cache_path}/stills";
-mkdir "$config{cache_path}/info";
+attempt_mkdir("$dune_path");
+attempt_mkdir("$dune_path/labels");
+attempt_mkdir("$dune_path/content");
+attempt_mkdir("$config{cache_path}");
+attempt_mkdir("$config{cache_path}/banners");
+attempt_mkdir("$config{cache_path}/stills");
+attempt_mkdir("$config{cache_path}/info");
 
 print 'Loading series list ...';
 opendir(my $base_dh, $base_path)
@@ -227,22 +227,6 @@ foreach my $series (@series) {
 	my $series_info_file = "$config{cache_path}/info/$series.json";
 	my $series_info = -e $series_info_file ? read_json($series_info_file) : {};
 
-	opendir(my $dh, "$base_path/$series")
-		or croak qq{Cannot open directory "$base_path/$series": $!};
-	my @seasons = readdir($dh);
-	closedir($dh);
-	@seasons = sort_nicely(grep { $_ ne '.' && $_ ne '..' } @seasons);
-
-	my $i = 0;
-	while ($i < @seasons && $mtimes{"$series/$seasons[$i]"}) {
-		$i++;
-	}
-	my $tree_ok = $mtimes{$series} && $i == @seasons;
-
-	my $renew_series_images = $renew_images
-		|| !exists $series_info->{content_box_y};
-	my $renew_season_images = $renew_images || !$tree_ok;
-
 	if (!$renew_images && !$renew_labels && !$renew_stills
 			&& $series_info->{update_date}
 			&& $mtimes{$series} < $series_info->{update_date}) {
@@ -256,7 +240,22 @@ foreach my $series (@series) {
 	}
 	print $/;
 
-	mkdir "$dune_path/content/$series";
+	opendir(my $dh, "$base_path/$series")
+		or croak qq{Cannot open directory "$base_path/$series": $!};
+	my @seasons = readdir($dh);
+	closedir($dh);
+	@seasons = sort_nicely(grep { $_ ne '.' && $_ ne '..' } @seasons);
+
+	my $i = 0;
+	while ($i < @seasons
+			&& $mtimes{"$series/$seasons[$i]"} < $series_info->{update_date}) {
+		$i++;
+	}
+	my $tree_ok = $mtimes{$series} && $i == @seasons;
+
+	my $renew_series_images = $renew_images
+		|| !exists $series_info->{content_box_y};
+	my $renew_season_images = $renew_images || !$tree_ok;
 
 	my $tvdb_series = find_tvdb_series($series);
 	my $series_name = defined $tvdb_series ? $tvdb_series->SeriesName : $series;
@@ -267,6 +266,8 @@ foreach my $series (@series) {
 		- $config{poster_width} - $config{background_padding} - 1
 		- $config{background_padding} - $config{background_padding};
 	my ($cboxy, $poster_gd, $fanart_gd);
+
+	attempt_mkdir("$dune_path/content/$series");
 
 	if ($renew_series_images) {
 		my $banner_gd;
@@ -400,7 +401,7 @@ END
 	my $scnt = 0;
 	foreach my $season_id (@seasons) {
 		print "  * $season_id$/";
-		mkdir "$dune_path/content/$series/$season_id";
+		attempt_mkdir("$dune_path/content/$series/$season_id");
 		my $path_season_num = ($season_id =~ /^S0*(\d+)$/) ? $1 : 0;
 		my $caption = $path_season_num ? "Season $path_season_num" : $season_id;
 		my $hash = create_label($caption,
@@ -1320,6 +1321,14 @@ sub unaccent {
 	my ($in) = @_;
 	utf8::encode($in) unless utf8::is_utf8($in);
 	return unidecode($in);
+}
+
+sub attempt_mkdir {
+	my ($path) = @_;
+	unless (-e $path) {
+		mkdir $path
+			or croak qq{Cannot create directory "$path": $!};
+	}
 }
 
 sub mtime {
