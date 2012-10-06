@@ -9,6 +9,7 @@ use Encode qw(encode_utf8);
 use File::Basename qw(dirname);
 use File::HomeDir qw(my_home);
 use File::Slurp qw(read_file write_file);
+use File::Spec qw();
 use File::Temp qw(:POSIX);
 use GD qw();
 use Getopt::Long qw(GetOptions);
@@ -22,6 +23,8 @@ use WebService::TVDB::Languages qw($languages);
 
 $| = 1;
 
+my $script_dir = dirname(File::Spec->rel2abs(__FILE__));
+
 my ($renew_images, $renew_labels, $renew_stills);
 my %opt = (
 		'renew-images' => \$renew_images,
@@ -34,8 +37,8 @@ if (-f $config_file) {
 	%config = %{read_json($config_file)};
 } else {
 	%config = (
-			regular_font_file => dirname($0) . '/Cabin-Regular.otf',
-			bold_font_file => dirname($0) . '/Cabin-Bold.otf',
+			regular_font_file => $script_dir . '/Cabin-Regular.otf',
+			bold_font_file => $script_dir . '/Cabin-Bold.otf',
 			series_summary_font_size => 19,
 			series_summary_leading => 1.5,
 			series_summary_opacity => 1,
@@ -214,7 +217,7 @@ my @tvdbs = map {
 		WebService::TVDB->new('language' => $_)
 	} @{$config{languages}};
 
-my $hd_gd = GD::Image->newFromPng(dirname($0) . '/hd.png', 1);
+my $hd_gd = GD::Image->newFromPng($script_dir . '/hd.png', 1);
 
 my $exts_re = join '|', map { quotemeta } @{$config{video_file_extensions}};
 
