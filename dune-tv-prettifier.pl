@@ -4,21 +4,21 @@ use strict;
 use warnings;
 
 use Carp qw(carp croak);
-use Getopt::Long qw(GetOptions);
-use WebService::TVDB qw();
-use WebService::TVDB::Languages qw($languages);
-use GD qw();
+use Digest::MD5 qw(md5_hex);
+use Encode qw(encode_utf8);
+use File::Basename qw(dirname);
+use File::HomeDir qw(my_home);
 use File::Slurp qw(read_file write_file);
 use File::Temp qw(:POSIX);
-use File::Basename qw(dirname);
-use Digest::MD5 qw(md5_hex);
-use List::Util qw(max);
-use Math::Round qw(round);
-use Encode qw(encode_utf8);
-use Text::Unidecode qw(unidecode);
-use LWP::Simple qw(getstore is_success);
+use GD qw();
+use Getopt::Long qw(GetOptions);
 use JSON qw(encode_json decode_json);
-use File::HomeDir qw(my_home);
+use List::Util qw(max);
+use LWP::Simple qw(getstore is_success);
+use Math::Round qw(round);
+use Text::Unidecode qw(unidecode);
+use WebService::TVDB qw();
+use WebService::TVDB::Languages qw($languages);
 
 $| = 1;
 
