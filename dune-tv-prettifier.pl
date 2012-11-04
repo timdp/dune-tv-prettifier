@@ -251,6 +251,7 @@ foreach my $series (@series) {
 
 	my $i = 0;
 	while ($i < @seasons
+			&& $series_info->{update_date}
 			&& $mtimes{"$series/$seasons[$i]"} < $series_info->{update_date}) {
 		$i++;
 	}
