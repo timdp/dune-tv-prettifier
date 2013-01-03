@@ -129,6 +129,8 @@ if ($config{access_protocol} eq 'smb') {
 		$auth .= ':' . URI::Escape::uri_escape($config{smb_password})
 			if defined $config{smb_password} && $config{smb_password} ne '';
 		$auth .= '@';
+	} else {
+		$auth = '';
 	}
 	$base_url = "$config{access_protocol}://$auth$server_name/$share_name";
 } else {
