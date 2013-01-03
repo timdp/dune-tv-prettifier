@@ -31,90 +31,92 @@ my %opt = (
 		'renew-labels' => \$renew_labels,
 		'renew-stills' => \$renew_stills,
 	);
-my %config;
-my $config_file = my_home() . '/.dune-tv-prettifier.json';
-if (-f $config_file) {
-	%config = %{read_json($config_file)};
-} else {
-	%config = (
-			regular_font_file => $script_dir . '/Cabin-Regular.otf',
-			bold_font_file => $script_dir . '/Cabin-Bold.otf',
-			series_summary_font_size => 19,
-			series_summary_leading => 1.5,
-			series_summary_opacity => 1,
-			episode_number_font_size => 19,
-			episode_title_font_size => 21,
-			episode_summary_font_size => 15,
-			episode_summary_leading => 1.5,
-			episode_summary_opacity => 0.5,
-			season_list_font_size => 22,
-			series_summary_max_height => 400,
-			series_summary_padding => 40,
-			episode_title_summary_margin => 11,
-			episode_number_padding => 10,
-			banner_font_size => 32,
-			poster_font_size => 72,
-			background_width => 1920,
-			background_height => 1080,
-			background_padding => 40,
-			banner_width => 758,
-			banner_height => 140,
-			poster_width => 680,
-			poster_height => 1000,
-			episode_height => 120,
-			episode_text_margin => 16,
-			episode_summary_overflow => 15,
-			episode_thumbnail_aspect_ratio => 16/9,
-			episode_thumbnail_text_distance => 25,
-			episode_padding_left => 40,
-			episode_padding_right => 30,
-			episodes_per_page => 6,
-			scrollbar_width => 40,
-			ribbon_offset => 200,
-			ribbon_thickness => 80,
-			ribbon_font_size => 32,
-			ribbon_text_color => [ 255, 255, 255 ],
-			ribbon_color => [ 191, 0, 0 ],
-			ribbon_shadow_offset => 10,
-			ribbon_shadow_opacity => 0.75,
-			ribbon_text_shadow_offset => 3,
-			placeholder_background_color => [ 15, 15, 15 ],
-			placeholder_foreground_color => [ 191, 191, 191 ],
-			backdrop_opacity => 0.1,
-			dark_overlay_opacity => 0.2,
-			light_overlay_opacity => 0.03,
-			episode_number_background_opacity => 0.67,
-			jpeg_quality => 90,
-			cache_path => undef,
-			mediainfo_path => undef,
-			ffmpeg_path => undef,
-			imagemagick_path => undef,
-			data_dir_name => '__Dune',
-			access_protocol => 'nfs',
-			smb_username => undef,
-			smb_password => undef
-		);
-	# TODO More robust option handling
-	foreach my $key (keys %config) {
-		(my $option_name = $key) =~ s/_/-/g;
-		if ($key =~ /_color$/) {
-			$opt{"$option_name=s"} = \&parse_color;
-		} else {
-			my $type = (defined $config{$key} && $config{$key} =~ /^[0-9.]+$/)
-				? 'f' : 's';
-			$opt{"$option_name=$type"} = \$config{$key};
-		}
+my %config = (
+		regular_font_file => $script_dir . '/Cabin-Regular.otf',
+		bold_font_file => $script_dir . '/Cabin-Bold.otf',
+		series_summary_font_size => 19,
+		series_summary_leading => 1.5,
+		series_summary_opacity => 1,
+		episode_number_font_size => 19,
+		episode_title_font_size => 21,
+		episode_summary_font_size => 15,
+		episode_summary_leading => 1.5,
+		episode_summary_opacity => 0.5,
+		season_list_font_size => 22,
+		series_summary_max_height => 400,
+		series_summary_padding => 40,
+		episode_title_summary_margin => 11,
+		episode_number_padding => 10,
+		banner_font_size => 32,
+		poster_font_size => 72,
+		background_width => 1920,
+		background_height => 1080,
+		background_padding => 40,
+		banner_width => 758,
+		banner_height => 140,
+		poster_width => 680,
+		poster_height => 1000,
+		episode_height => 120,
+		episode_text_margin => 16,
+		episode_summary_overflow => 15,
+		episode_thumbnail_aspect_ratio => 16/9,
+		episode_thumbnail_text_distance => 25,
+		episode_padding_left => 40,
+		episode_padding_right => 30,
+		episodes_per_page => 6,
+		scrollbar_width => 40,
+		ribbon_offset => 200,
+		ribbon_thickness => 80,
+		ribbon_font_size => 32,
+		ribbon_text_color => [ 255, 255, 255 ],
+		ribbon_color => [ 191, 0, 0 ],
+		ribbon_shadow_offset => 10,
+		ribbon_shadow_opacity => 0.75,
+		ribbon_text_shadow_offset => 3,
+		placeholder_background_color => [ 15, 15, 15 ],
+		placeholder_foreground_color => [ 191, 191, 191 ],
+		backdrop_opacity => 0.1,
+		dark_overlay_opacity => 0.2,
+		light_overlay_opacity => 0.03,
+		episode_number_background_opacity => 0.67,
+		jpeg_quality => 90,
+		cache_path => undef,
+		mediainfo_path => undef,
+		ffmpeg_path => undef,
+		imagemagick_path => undef,
+		data_dir_name => '__Dune',
+		access_protocol => 'nfs',
+		smb_username => undef,
+		smb_password => undef
+	);
+# TODO More robust option handling
+foreach my $key (keys %config) {
+	(my $option_name = $key) =~ s/_/-/g;
+	if ($key =~ /_color$/) {
+		$opt{"$option_name=s"} = \&parse_color;
+	} else {
+		my $type = (defined $config{$key} && $config{$key} =~ /^[0-9.]+$/)
+			? 'f' : 's';
+		$opt{"$option_name=$type"} = \$config{$key};
 	}
-	$opt{'language=s'} = $config{languages} = [];
-	$opt{'extra-menu-item=s'} = $config{extra_menu_items} = [];
-	$opt{'video-file-extension=s'} = $config{video_file_extensions} = [];
-	$opt{'episode-filename-ignore=s'} = $config{episode_filename_ignore} = [];
 }
+$opt{'language=s'} = $config{languages} = [];
+$opt{'extra-menu-item=s'} = $config{extra_menu_items} = [];
+$opt{'video-file-extension=s'} = $config{video_file_extensions} = [];
+$opt{'episode-filename-ignore=s'} = $config{episode_filename_ignore} = [];
 GetOptions(%opt) or exit 1;
 @{$config{languages}} = 'English'
 	unless @{$config{languages}};
 @{$config{video_file_extensions}} = qw(avi mkv mp4 m4v mpg wmv mov flv)
 	unless @{$config{video_file_extensions}};
+
+my $config_file = my_home() . '/.dune-tv-prettifier.json';
+if (-f $config_file) {
+	my $conf = read_json($config_file);
+	while (my ($key, $value) = each %$conf) {
+		$config{$key} = $value if exists $config{$key};
+	}
+}
 
 @ARGV < 2 and croak "Usage: $0 server share [mount]";
 my ($server_name, $share_name, $base_path) = @ARGV;
