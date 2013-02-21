@@ -1213,7 +1213,7 @@ sub scale_image {
 
 sub create_placeholder {
 	my ($title, $width, $height, $font_file, $font_size) = @_;
-	my $img = GD::Image->new($width, $height);
+	my $img = GD::Image->new($width, $height, 1);
 	my $bg = $img->colorAllocate(@{$config{placeholder_background_color}});
 	my $fg = $img->colorAllocate(@{$config{placeholder_foreground_color}});
 	my $w = get_text_width($title, $font_file, $font_size);
