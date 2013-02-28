@@ -212,7 +212,7 @@ if (-e $id_file) {
 	open(my $fh, '<', $id_file)
 		or croak qq{Cannot open "$id_file" for reading: $!};
 	while (<$fh>) {
-		/(.*)\s+(\d+)/ and $tvdb_ids{lc $1} = $2;
+		/(.*?)\s+(\d+)\s*$/ and $tvdb_ids{lc $1} = $2;
 	}
 	close($fh);
 }
